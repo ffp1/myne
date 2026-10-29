@@ -105,10 +105,12 @@ struct TalkListView: View {
                         Label("削除", systemImage: "trash.fill")
                     }
                     .tint(.red)
-                    Button { pending = .hide([room.id]) } label: {
-                        Label("非表示", systemImage: "eye.slash")
+                    if !room.isMine {
+                        Button { pending = .hide([room.id]) } label: {
+                            Label("非表示", systemImage: "eye.slash")
+                        }
+                        .tint(.gray)
                     }
-                    .tint(.gray)
                 }
                 .swipeActions(edge: .leading, allowsFullSwipe: unread > 0) {
                     if unread > 0 {
@@ -134,7 +136,9 @@ struct TalkListView: View {
                     Button(prefs.isMuted ? "通知オン" : "通知オフ", systemImage: prefs.isMuted ? "speaker.2.fill" : "speaker.slash.fill") {
                         model.toggleMute(room.id)
                     }
-                    Button("非表示", systemImage: "eye.slash") { pending = .hide([room.id]) }
+                    if !room.isMine {
+                        Button("非表示", systemImage: "eye.slash") { pending = .hide([room.id]) }
+                    }
                     Button("削除", systemImage: "trash.fill", role: .destructive) { pending = .delete([room.id]) }
                 } preview: {
                     RoomPreview(room: room, model: model)

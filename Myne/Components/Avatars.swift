@@ -70,7 +70,13 @@ struct RoomAvatar: View {
     var size: CGFloat
 
     var body: some View {
-        if room.isGroup {
+        if room.isMine {
+            Image(systemName: "bookmark.fill")
+                .font(.system(size: size * 0.4, weight: .semibold))
+                .foregroundStyle(Color.onBrand)
+                .frame(width: size, height: size)
+                .background(Circle().fill(Color.brand))
+        } else if room.isGroup {
             Group {
                 if let icon = room.iconId {
                     RemoteImage(id: icon)

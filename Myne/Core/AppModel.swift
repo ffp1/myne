@@ -124,6 +124,21 @@ final class AppModel {
         })
 
         NotificationPresenter.requestAuthorization()
+        Task { await ensureMyRoom() }
+    }
+
+    var myRoomId: String { "mine_\(uid ?? "")" }
+
+    /// マイルームは全ユーザーに最初から用意する
+    private func ensureMyRoom() async {
+        guard let uid else { return }
+        let ref = db.collection("rooms").document(myRoomId)
+        guard let snap = try? await ref.getDocument(), !snap.exists else { return }
+        let room = Room(
+            id: myRoomId, type: .mine, members: [uid], name: nil, iconId: nil, lastMessage: nil,
+            updatedAt: Date(), unread: [:], readAt: [:], createdBy: uid
+        )
+        try? ref.setData(from: room) { _ in }
     }
 
     private func stopListeners() {
@@ -204,6 +219,7 @@ final class AppModel {
     var bellSymbol: String { hasUnreadNotifications || !birthdayFriends.isEmpty ? "bell.badge" : "bell" }
 
     func displayName(_ room: Room) -> String {
+        if room.isMine { return "マイルーム" }
         if room.isGroup {
             if let name = room.name, !name.isEmpty { return name }
             return room.members.filter { $0 != uid }.compactMap { users[$0]?.name }.joined(separator: ", ")

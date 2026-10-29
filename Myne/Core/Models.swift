@@ -2,6 +2,8 @@ import Foundation
 
 enum RoomType: String, Codable {
     case direct, group
+    /// 自分だけのメモ用ルーム（マイルーム）
+    case mine
 }
 
 struct LastMessage: Codable, Hashable {
@@ -23,6 +25,7 @@ struct Room: Codable, Identifiable, Hashable {
     var createdBy: String
 
     var isGroup: Bool { type == .group }
+    var isMine: Bool { type == .mine }
 
     func unreadCount(for uid: String?) -> Int {
         guard let uid else { return 0 }

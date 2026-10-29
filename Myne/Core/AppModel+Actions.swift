@@ -180,7 +180,7 @@ extension AppModel {
     }
 
     func hide(_ ids: [String]) {
-        for id in ids { setPref(id, ["hidden": true, "pinned": false]) }
+        for id in ids where id != myRoomId { setPref(id, ["hidden": true, "pinned": false]) }
     }
 
     func unhide(_ id: String) {
@@ -191,7 +191,9 @@ extension AppModel {
     func deleteRooms(_ ids: [String]) {
         for id in ids {
             markRead(id)
-            setPref(id, ["hidden": true, "pinned": false, "clearedAt": Timestamp(date: Date())])
+            // マイルームは中身だけ消して一覧には残す
+            let hides = id != myRoomId
+            setPref(id, ["hidden": hides, "pinned": hides ? false : pref(id).isPinned, "clearedAt": Timestamp(date: Date())])
             messageCache[id] = nil
         }
     }

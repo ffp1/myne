@@ -229,7 +229,9 @@ struct ChatRoomView: View {
 
     private func tapTitle() {
         guard let room else { return }
-        if room.isGroup {
+        if room.isMine {
+            if let uid = model.uid { model.presentMyScreen(uid) }
+        } else if room.isGroup {
             showMembers = true
         } else if let partner = room.partner(of: model.uid) {
             model.presentMyScreen(partner)
