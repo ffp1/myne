@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn() && me() == uid;
+
+      match /friends/{friendId} {
+        allow read, write: if signedIn() && me() == uid;
+      }
+      match /roomPrefs/{roomId} {
+        allow read, write: if signedIn() && me() == uid;
+      }
+      match /notifications/{notificationId} {
+        allow read, update, delete: if signedIn() && me() == uid;
+        allow create: if signedIn() && request.resource.data.fromUid == me();
+      }
+    }
+
+    match /myneIds/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == me();
+      allow delete: if signedIn() && resource.data.uid == me();
+    }
+
+    match /rooms/{roomId} {
+      allow read: if signedIn() && (resource == null || me() in resource.data.members);
+      allow create: if signedIn() && me() in request.resource.data.members;
+      allow update: if signedIn() && me() in resource.data.members;
+
+      match /messages/{messageId} {
+        function isMember() {
+          return me() in get(/databases/$(database)/documents/rooms/$(roomId)).data.members;
+        }
+        allow read: if signedIn() && isMember();
+        allow create: if signedIn() && isMember() && request.resource.data.senderId == me();
+        allow update: if signedIn() && isMember();
+      }
+    }
+
+    match /images/{imageId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.owner == me();
+      allow delete: if signedIn() && resource.data.owner == me();
+    }
+  }
+}

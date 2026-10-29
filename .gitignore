@@ -1,0 +1,14 @@
+# Xcode (XcodeGen が生成する)
+*.xcodeproj/
+*.xcworkspace/
+Myne/Info.plist
+build/
+DerivedData/
+Payload/
+*.ipa
+xcuserdata/
+
+# Firebase 設定（GitHub Secret から復元する）
+GoogleService-Info.plist
+
+.DS_Store

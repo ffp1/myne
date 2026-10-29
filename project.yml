@@ -1,0 +1,66 @@
+name: Myne
+options:
+  bundleIdPrefix: com.myne
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    # GitHub Actions が GoogleService-Info.plist から上書きする
+    REVERSED_CLIENT_ID: com.googleusercontent.apps.placeholder
+
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    minVersion: 11.0.0
+    maxVersion: 13.0.0
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    minVersion: 8.0.0
+    maxVersion: 10.0.0
+
+targets:
+  Myne:
+    type: application
+    platform: iOS
+    sources:
+      - path: Myne
+    info:
+      path: Myne/Info.plist
+      properties:
+        CFBundleDisplayName: Myne
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        ITSAppUsesNonExemptEncryption: false
+        NSCameraUsageDescription: QRコードを読み取って友だちを追加するために使用します
+        UIBackgroundModes: [fetch]
+        BGTaskSchedulerPermittedIdentifiers: [com.myne.app.refresh]
+        CFBundleURLTypes:
+          - CFBundleURLName: myne
+            CFBundleURLSchemes: [myne]
+          - CFBundleURLName: google
+            CFBundleURLSchemes: [$(REVERSED_CLIENT_ID)]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.myne.app
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        OTHER_LDFLAGS: $(inherited) -ObjC
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+        CODE_SIGN_IDENTITY: ""
+    dependencies:
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore
+      - package: GoogleSignIn
+        product: GoogleSignIn
+    scheme: {}
